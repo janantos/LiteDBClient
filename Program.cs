@@ -1,24 +1,60 @@
 ﻿using System;
 using System.Linq;
 using LiteDB;
+using System.Text.RegularExpressions;
 
 namespace LiteDBClient
 {
+    class AutoCompletionHandler : IAutoCompleteHandler
+{
+    // characters to start completion from
+    public char[] Separators { get; set; } = new char[] { ' ', '.', '/', '\\' };
+
+    // text - The current text entered in the console
+    // index - The index of the terminal cursor within {text}
+    public string[] GetSuggestions(string text, int index)
+    {
+        string cmdpattern = @"^db.*.";
+        if (text.StartsWith("\\"))
+            return new string[] { "a", "c", "h", "q", "s" }; 
+        else if (text.StartsWith("db.") && text.Length == 3) 
+        {
+            string[] collections;
+            using(var db = new LiteDatabase(Program.connString))
+            {
+                collections = db.GetCollectionNames().ToArray();
+            }
+            return collections;
+        }
+        else if (Regex.Match(text, cmdpattern).Success)
+        {
+            string[] commands = new string[] {"insert", "bulk", "update", "delete", "ensureIndex", "indexes", "dropIndex", "drop", "rename", "count", "min", "max", "find", "select"};
+            var result = commands.Where (c => c.StartsWith(text.Split('.')[2])).ToArray();
+
+            return result;
+        }
+        else
+            return null;
+    }
+}
+
     class Program
     {
+        public static string connString = "";
         static void Main(string[] args)
         {
-	    ReadLine.HistoryEnabled = false;
+	        ReadLine.HistoryEnabled = true;
+            ReadLine.AutoCompletionHandler = new AutoCompletionHandler();
             Console.Clear();
             Console.WriteLine("LiteDBClient\nFor help type \\h");
-            string connString = "";
+            
             string prompt = "";
             Console.BackgroundColor = ConsoleColor.Black;
             while (prompt != "\\q") 
             {
-		Console.Write(">");
+		        Console.Write(">");
                 prompt = ReadLine.Read();
-		ReadLine.AddHistory(prompt);
+		        ReadLine.AddHistory(prompt);
                 if (prompt == "\\c") 
                 {
                     Console.Write("Connection String: ");
