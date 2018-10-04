@@ -5,8 +5,13 @@ using System.Text.RegularExpressions;
 
 namespace LiteDBClient
 {
+    class SharedVariables
+    {
+        public static string connectionString;
+        public static ConsoleColor fgcolor;
+    }
     class AutoCompletionHandler : IAutoCompleteHandler
-{
+    {
     // characters to start completion from
     public char[] Separators { get; set; } = new char[] { ' ', '.', '/', '\\' };
 
@@ -23,7 +28,7 @@ namespace LiteDBClient
             string[] collections;
             try
             {
-            using(var db = new LiteDatabase(Program.connString))
+            using(var db = new LiteDatabase(SharedVariables.connectionString))
             {
                 collections = db.GetCollectionNames().ToArray();
             }
@@ -45,16 +50,15 @@ namespace LiteDBClient
 
     class Program
     {
-        public static string connString = "";
         static void Main(string[] args)
         {
+            SharedVariables.fgcolor = Console.ForegroundColor;
 	        ReadLine.HistoryEnabled = true;
             ReadLine.AutoCompletionHandler = new AutoCompletionHandler();
             Console.Clear();
             Console.WriteLine("LiteDBClient\nFor help type \\h");
             
             string prompt = "";
-            Console.BackgroundColor = ConsoleColor.Black;
             while (prompt != "\\q") 
             {
 		        Console.Write(">");
@@ -63,7 +67,7 @@ namespace LiteDBClient
                 if (prompt == "\\c") 
                 {
                     Console.Write("Connection String: ");
-                    connString = Console.ReadLine();
+                    SharedVariables.connectionString = Console.ReadLine();
                 }
                 else if (prompt == "\\q") 
                 {
@@ -83,7 +87,7 @@ namespace LiteDBClient
                     string answ = Console.ReadLine();
                     if(answ=="Y" || answ=="y") 
                     {
-                        using(var db = new LiteDatabase(connString))
+                        using(var db = new LiteDatabase(SharedVariables.connectionString))
                         {
                             db.Shrink();
                         }
@@ -94,33 +98,33 @@ namespace LiteDBClient
                     try 
                     {
                         int line = 1;
-                        using(var db = new LiteDatabase(connString))
+                        using(var db = new LiteDatabase(SharedVariables.connectionString))
                         {
                             foreach (var x in db.Engine.Run(prompt).ToList())
                             {
                                 Console.ForegroundColor = ConsoleColor.Yellow;
                                 Console.Write("[" + line.ToString() + "]:");
-                                Console.ForegroundColor = ConsoleColor.White;
+                                Console.ForegroundColor = SharedVariables.fgcolor;
                                 Console.WriteLine(x.ToString());
                                 line++;
                             }
                             Console.ForegroundColor = ConsoleColor.Yellow;
                             Console.WriteLine("Items returned: " + (line-1).ToString());
-                            Console.ForegroundColor = ConsoleColor.White;
+                            Console.ForegroundColor = SharedVariables.fgcolor;
                         }
                     }
-                    catch (ArgumentNullException ex)
+                    catch (ArgumentNullException)
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("Error.");
                         Console.WriteLine("No database opened.");
-                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.ForegroundColor = SharedVariables.fgcolor;
                     } 
                     catch (Exception ex){
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("Error.");
                         Console.WriteLine(ex.Message);
-                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.ForegroundColor = SharedVariables.fgcolor;
                     }
                 }
                 else 
@@ -128,7 +132,7 @@ namespace LiteDBClient
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Error.");
                     Console.WriteLine("Command not recognized");
-                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.ForegroundColor = SharedVariables.fgcolor;
                 }
             }
         }
