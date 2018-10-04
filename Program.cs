@@ -20,11 +20,15 @@ namespace LiteDBClient
         else if (text.StartsWith("db.") && text.Length == 3) 
         {
             string[] collections;
+            try
+            {
             using(var db = new LiteDatabase(Program.connString))
             {
                 collections = db.GetCollectionNames().ToArray();
             }
-            return collections;
+            var result = collections.Where (c => c.StartsWith(text.Split('.')[1])).ToArray();
+            return result;
+            } catch {return null;}
         }
         else if (Regex.Match(text, cmdpattern).Success)
         {
