@@ -14,10 +14,11 @@ namespace LiteDBClient
     // index - The index of the terminal cursor within {text}
     public string[] GetSuggestions(string text, int index)
     {
-        string cmdpattern = @"^db.*.";
+        string cmdpattern = @"^db[.]\w*[.]";
+        
         if (text.StartsWith("\\"))
             return new string[] { "a", "c", "h", "q", "s" }; 
-        else if (text.StartsWith("db.") && text.Length == 3) 
+        else if (text.StartsWith("db.") && text.Count(x => x=='.')==1) 
         {
             string[] collections;
             try
