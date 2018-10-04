@@ -8,6 +8,7 @@ namespace LiteDBClient
     {
         static void Main(string[] args)
         {
+	    ReadLine.HistoryEnabled = false;
             Console.Clear();
             Console.WriteLine("LiteDBClient\nFor help type \\h");
             string connString = "";
@@ -15,8 +16,9 @@ namespace LiteDBClient
             Console.BackgroundColor = ConsoleColor.Black;
             while (prompt != "\\q") 
             {
-                Console.Write(">");
-                prompt = Console.ReadLine();
+		Console.Write(">");
+                prompt = ReadLine.Read();
+		ReadLine.AddHistory(prompt);
                 if (prompt == "\\c") 
                 {
                     Console.Write("Connection String: ");
