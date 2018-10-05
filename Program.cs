@@ -112,6 +112,7 @@ namespace LiteDBClient
                             Console.WriteLine("Items returned: " + (line-1).ToString());
                             Console.ForegroundColor = SharedVariables.fgcolor;
                         }
+                        GC.Collect(); // Free memory ASAP
                     }
                     catch (ArgumentNullException)
                     {
