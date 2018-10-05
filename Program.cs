@@ -100,7 +100,7 @@ namespace LiteDBClient
                         int line = 1;
                         using(var db = new LiteDatabase(SharedVariables.connectionString))
                         {
-                            foreach (var x in db.Engine.Run(prompt).ToList())
+                            foreach (var x in db.Engine.Run(prompt))
                             {
                                 Console.ForegroundColor = ConsoleColor.Yellow;
                                 Console.Write("[" + line.ToString() + "]:");
