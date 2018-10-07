@@ -7,5 +7,8 @@ I have implemented this in couple of hours as dirty solution to provide me clien
 ## Instalation
 As it it .NET Core application, you only need to have .NET Core SDK and run dotnet run.
 
+## Functionality
+Currently only DB commands are supported, File Storage are unsupported.
+
 ## Licence
 The Unlicence
